@@ -1,115 +1,242 @@
-# FlySmart MySQL Database Setup
+# Backend Setup Guide
 
 ## Prerequisites
 
-1. **MySQL Server** must be installed on your system
-   - Windows: Download from https://dev.mysql.com/downloads/mysql/
-   - Mac: `brew install mysql`
-   - Linux: `sudo apt-get install mysql-server`
+- Node.js v14+ (already installed ✓)
+- PostgreSQL 12+ 
 
-2. **Start MySQL Server**
-   - Windows: MySQL typically runs as a service automatically
-   - Mac: `brew services start mysql`
-   - Linux: `sudo systemctl start mysql`
+## Step 1: Install PostgreSQL
 
-## Setup Steps
+### macOS
+```bash
+brew install postgresql
+brew services start postgresql
+```
 
-### 1. Configure Database Connection
+### Ubuntu/Debian
+```bash
+sudo apt-get update
+sudo apt-get install postgresql postgresql-contrib
+```
 
-Edit the `.env` file in the Backend folder:
+### Windows
+Download from: https://www.postgresql.org/download/windows/
+
+## Step 2: Create Database
+
+### Option A: Using the setup script (macOS/Linux)
+```bash
+chmod +x setup-db.sh
+./setup-db.sh
+```
+
+### Option B: Manual setup
+```bash
+# Connect to PostgreSQL
+psql -U postgres
+
+# Run these commands:
+CREATE DATABASE flight_booking;
+\q
+```
+
+## Step 3: Configure Environment
+
+The `.env` file is already created with default values:
 
 ```env
+PORT=5000
+NODE_ENV=development
+
+# Database
 DB_HOST=localhost
-DB_PORT=3306
-DB_USER=root
-DB_PASSWORD=your_password
-DB_NAME=flysmart
-PORT=4000
+DB_PORT=5432
+DB_NAME=flight_booking
+DB_USER=postgres
+DB_PASSWORD=password
+
+# JWT
+JWT_SECRET=your_secret_key_change_this_in_production
+JWT_EXPIRE=7d
 ```
 
-Change `DB_PASSWORD` if your MySQL root user has a password.
+**Update `DB_PASSWORD` if your PostgreSQL password is different.**
 
-### 2. Initialize Database
+## Step 4: Start the Server
 
-Run the setup script to create database and tables:
-
+### Development mode (with auto-reload)
 ```bash
-cd Backend
-node setup-db.js
+npm run dev
+```
+
+### Production mode
+```bash
+npm start
 ```
 
 You should see:
 ```
-✓ Connected to MySQL
-✓ Database initialized successfully!
-✓ Database: flysmart
-✓ Tables created
-✓ Sample data inserted
+✓ Database connection successful
+✓ Database models synced
+✓ Server running on http://localhost:5000
+✓ Environment: development
 ```
 
-### 3. Start the Backend Server
+## Step 5: Seed Sample Data (Optional)
+
+After the server starts successfully, in a new terminal run:
 
 ```bash
-cd Backend
-npm run dev
+npm run seed
 ```
 
-You should see:
-```
-✓ MySQL database connected
-FlySmart backend running at http://localhost:4000
-```
+This will create 5 sample flights for testing.
 
-### 4. Start the Frontend Server
+## API Testing
 
-In a new terminal:
-
+### Test Health Endpoint
 ```bash
-cd Frontend
-npm run dev
+curl http://localhost:5000/api/health
 ```
 
-Open http://localhost:5173 in your browser.
+### Register a User
+```bash
+curl -X POST http://localhost:5000/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "firstName": "John",
+    "lastName": "Doe",
+    "email": "john@example.com",
+    "password": "password123",
+    "confirmPassword": "password123"
+  }'
+```
 
-## Test Credentials
+### Login
+```bash
+curl -X POST http://localhost:5000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "john@example.com",
+    "password": "password123"
+  }'
+```
 
-**Email:** rahul.sharma@gmail.com  
-**Password:** demo1234
+### Search Flights
+```bash
+curl "http://localhost:5000/api/flights/search?departure=New York&arrival=Los Angeles&departureDate=2025-05-20"
+```
 
-## Database Tables
-
-- **users** - User accounts
-- **flights** - Flight listings
-- **bookings** - Flight bookings
-- **destinations** - Popular routes
+### Create Booking (requires token)
+```bash
+curl -X POST http://localhost:5000/api/bookings \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_TOKEN_HERE" \
+  -d '{
+    "flightId": "flight-uuid",
+    "passengerName": "John Doe",
+    "seatClass": "economy"
+  }'
+```
 
 ## Troubleshooting
 
-### "MySQL connection error"
-- Check if MySQL server is running
-- Verify DB_HOST and DB_PORT in .env
-- Ensure DB_USER and DB_PASSWORD are correct
+### Error: database "flight_booking" does not exist
+✅ Solution: Create the database first (see Step 2)
 
-### "Database does not exist"
-- Run `node setup-db.js` again
-- Check MySQL error logs
+### Error: ECONNREFUSED for PostgreSQL
+✅ Solution: Make sure PostgreSQL is running
+- macOS: `brew services start postgresql`
+- Ubuntu: `sudo service postgresql start`
+- Windows: Check PostgreSQL service in Services
 
-### Port 3306 already in use
-- Change `DB_PORT` in .env to another port (e.g., 3307)
-- Update MySQL connection string
+### Error: connection timeout
+✅ Solution: Check your `.env` database credentials
 
-## Manual Database Setup (Alternative)
+### Port 5000 already in use
+✅ Solution: Change PORT in `.env` or kill the process:
+```bash
+lsof -ti:5000 | xargs kill -9
+```
 
-If the setup script fails, manually initialize:
+## PostgreSQL Commands (Useful)
 
-1. Open MySQL client:
-   ```bash
-   mysql -u root -p
-   ```
+```bash
+# Connect to database
+psql -U postgres -d flight_booking
 
-2. Run commands from `database.sql`:
-   ```sql
-   CREATE DATABASE IF NOT EXISTS flysmart;
-   USE flysmart;
-   -- ... run all CREATE TABLE and INSERT statements from database.sql
-   ```
+# Inside psql:
+\dt                    # List tables
+\d Users               # Describe Users table
+SELECT * FROM "Users"; # Query data
+\q                     # Quit
+
+# Backup database
+pg_dump -U postgres flight_booking > backup.sql
+
+# Restore database
+psql -U postgres flight_booking < backup.sql
+```
+
+## Security Notes
+
+⚠️ **Before production deployment:**
+
+1. Change `JWT_SECRET` to a strong random key
+2. Change default database password
+3. Set `NODE_ENV=production`
+4. Add rate limiting
+5. Enable HTTPS
+6. Add request validation
+7. Implement proper error handling (don't expose internal errors)
+8. Add logging and monitoring
+
+## Next Steps
+
+1. ✅ Backend API is set up and running
+2. Connect Frontend to Backend APIs
+3. Integrate payment gateway (Stripe/PayPal)
+4. Add email notifications
+5. Set up admin dashboard
+6. Deploy to production
+
+## File Structure Reference
+
+```
+Backend/
+├── config/
+│   └── database.js              # Database connection
+├── models/
+│   ├── User.js                  # User model
+│   ├── Flight.js                # Flight model
+│   ├── Booking.js               # Booking model
+│   ├── Payment.js               # Payment model
+│   └── index.js                 # Model associations
+├── controllers/
+│   ├── authController.js        # Auth logic
+│   ├── flightController.js      # Flight logic
+│   ├── bookingController.js     # Booking logic
+│   ├── paymentController.js     # Payment logic
+│   └── userController.js        # Profile logic
+├── routes/
+│   ├── auth.js                  # Auth routes
+│   ├── flights.js               # Flight routes
+│   ├── bookings.js              # Booking routes
+│   ├── payments.js              # Payment routes
+│   └── users.js                 # User routes
+├── middleware/
+│   └── auth.js                  # JWT authentication
+├── index.js                     # Main server file
+├── seed.js                      # Database seeder
+├── setup-db.sh                  # Database setup script
+├── package.json
+├── .env                         # Environment variables
+└── README.md                    # Full documentation
+```
+
+## Support
+
+For issues or questions, check:
+- The main README.md for API documentation
+- PostgreSQL logs: `tail -f /usr/local/var/log/postgres.log` (macOS)
+- Node.js console output
