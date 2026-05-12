@@ -1,0 +1,1483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SkyFly — Flight Booking</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --sky:#1a3a5c;--sky-mid:#2e5f8a;--sky-light:#e8f4fd;
+  --gold:#e8a020;--gold-light:#fdf3e0;
+  --white:#fff;--text:#1a2733;--muted:#6b8099;
+  --bg:#f4f7fa;--card:#fff;--border:rgba(0,0,0,0.09);
+  --success:#2d7a3a;--success-bg:#eaf6ec;
+  --danger:#c0392b;--danger-bg:#fdecea;
+  --font-display:'Playfair Display',serif;
+  --font-body:'DM Sans',sans-serif;
+  --radius:10px;--radius-lg:16px;
+}
+body{font-family:var(--font-body);color:var(--text);background:var(--bg);min-height:100vh}
+
+/* ─── PAGES ─── */
+.page{display:none;min-height:100vh;animation:fadeIn 0.25s ease}
+.page.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* ─── NAVBAR ─── */
+nav{
+  background:#0d2b47;padding:0 2rem;height:60px;
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:100;
+}
+.brand{display:flex;align-items:center;gap:8px;cursor:pointer}
+.brand i{color:#e8a020;font-size:20px}
+.brand-name{font-family:var(--font-display);color:#fff;font-size:20px;font-weight:700}
+.nav-links{display:flex;gap:0}
+.nav-link{
+  color:rgba(255,255,255,0.6);padding:0 16px;height:60px;
+  display:flex;align-items:center;font-size:13px;cursor:pointer;
+  border-bottom:2px solid transparent;transition:all 0.2s;
+}
+.nav-link:hover,.nav-link.active{color:#fff;border-bottom-color:#e8a020}
+.nav-right{display:flex;align-items:center;gap:12px}
+.btn-login{
+  padding:7px 16px;border:1px solid rgba(255,255,255,0.3);
+  border-radius:6px;color:#fff;background:transparent;
+  font-size:13px;cursor:pointer;font-family:var(--font-body);
+  transition:all 0.2s;
+}
+.btn-login:hover{background:rgba(255,255,255,0.1)}
+.btn-signup{
+  padding:7px 16px;background:#e8a020;border:none;
+  border-radius:6px;color:#fff;font-size:13px;cursor:pointer;
+  font-family:var(--font-body);font-weight:500;transition:all 0.2s;
+}
+.btn-signup:hover{background:#d4900f}
+
+/* ─── HERO ─── */
+.hero{
+  background:linear-gradient(135deg,#0d2b47 0%,#1a3a5c 60%,#0a4f7a 100%);
+  padding:3rem 2rem 2rem;position:relative;overflow:hidden;
+}
+.hero::before,.hero::after{
+  content:'';position:absolute;border-radius:50%;border:1px solid rgba(255,255,255,0.05);
+}
+.hero::before{width:500px;height:500px;top:-200px;right:-150px}
+.hero::after{width:300px;height:300px;top:-50px;right:50px}
+.hero-inner{max-width:900px;margin:0 auto}
+.hero h1{
+  font-family:var(--font-display);font-size:42px;font-weight:900;
+  color:#fff;line-height:1.15;margin-bottom:0.5rem;
+}
+.hero-sub{font-size:15px;color:rgba(255,255,255,0.6);margin-bottom:2rem}
+
+/* ─── SEARCH BOX ─── */
+.search-box{
+  background:#fff;border-radius:var(--radius-lg);
+  padding:1.5rem;max-width:900px;margin:0 auto;
+  box-shadow:0 8px 40px rgba(0,0,0,0.15);
+}
+.trip-tabs{display:flex;gap:0;margin-bottom:1.2rem;border-bottom:1px solid #eee}
+.trip-tab{
+  padding:8px 18px;font-size:13px;border:none;background:none;
+  color:var(--muted);cursor:pointer;font-family:var(--font-body);
+  border-bottom:2px solid transparent;margin-bottom:-1px;transition:all 0.2s;
+}
+.trip-tab.active{color:var(--sky);border-bottom-color:var(--sky);font-weight:500}
+
+.search-row{display:grid;grid-template-columns:1fr 36px 1fr 1fr 1fr auto;gap:8px;align-items:end}
+.sf{display:flex;flex-direction:column;gap:4px}
+.sf label{font-size:10px;text-transform:uppercase;letter-spacing:0.8px;color:var(--muted);font-weight:600}
+.sf-input{
+  border:1px solid #dce3ea;border-radius:8px;padding:10px 12px;
+  display:flex;align-items:center;gap:8px;cursor:pointer;
+  transition:border 0.2s;background:#fff;
+}
+.sf-input:hover,.sf-input:focus-within{border-color:var(--sky)}
+.sf-input i{color:var(--muted);font-size:16px;flex-shrink:0}
+.sf-val{font-size:14px;font-weight:500;color:var(--text)}
+.sf-val small{font-size:11px;font-weight:400;color:var(--muted);display:block}
+.sf-val input{
+  border:none;outline:none;font-size:14px;font-weight:500;
+  color:var(--text);width:100%;font-family:var(--font-body);background:transparent;
+}
+.sf-val select{
+  border:none;outline:none;font-size:14px;font-weight:500;
+  color:var(--text);font-family:var(--font-body);background:transparent;cursor:pointer;
+}
+
+.swap-btn{
+  width:36px;height:36px;border-radius:50%;border:1px solid #dce3ea;
+  background:#fff;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;color:var(--sky);margin-bottom:2px;align-self:flex-end;
+  transition:all 0.2s;
+}
+.swap-btn:hover{background:var(--sky);color:#fff;border-color:var(--sky)}
+
+.btn-search{
+  background:var(--sky);color:#fff;border:none;border-radius:8px;
+  padding:12px 24px;font-size:14px;font-weight:600;cursor:pointer;
+  font-family:var(--font-body);display:flex;align-items:center;gap:8px;
+  transition:all 0.2s;white-space:nowrap;
+}
+.btn-search:hover{background:var(--sky-mid);transform:translateY(-1px)}
+
+/* ─── SECTIONS ─── */
+.section{padding:2.5rem 2rem;max-width:960px;margin:0 auto}
+.section-head{margin-bottom:1.25rem}
+.section-head h2{font-family:var(--font-display);font-size:24px;font-weight:700;color:var(--text)}
+.section-head p{font-size:13px;color:var(--muted);margin-top:3px}
+
+/* ─── DESTINATION CARDS ─── */
+.dest-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.dest-card{
+  border-radius:var(--radius-lg);overflow:hidden;cursor:pointer;
+  transition:transform 0.2s,box-shadow 0.2s;
+  box-shadow:0 2px 12px rgba(0,0,0,0.08);
+}
+.dest-card:hover{transform:translateY(-4px);box-shadow:0 8px 30px rgba(0,0,0,0.15)}
+.dest-img{
+  height:110px;position:relative;display:flex;align-items:flex-end;padding:14px;
+}
+.dest-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(5,20,40,0.75),rgba(5,20,40,0.1))}
+.dest-city{font-family:var(--font-display);font-size:17px;font-weight:700;color:#fff;position:relative;z-index:1}
+.dest-body{padding:10px 14px;background:#fff;display:flex;justify-content:space-between;align-items:center}
+.dest-route{font-size:12px;color:var(--muted)}
+.dest-price{font-size:14px;font-weight:600;color:var(--sky)}
+
+.bg1{background:linear-gradient(135deg,#0a3d62,#1e6fa8)}
+.bg2{background:linear-gradient(135deg,#7b0d1e,#c0392b)}
+.bg3{background:linear-gradient(135deg,#1a5c3a,#27ae60)}
+.bg4{background:linear-gradient(135deg,#5c3a1a,#c0862b)}
+.bg5{background:linear-gradient(135deg,#3a1a5c,#7b2fb0)}
+.bg6{background:linear-gradient(135deg,#1a5c5c,#2ba8a8)}
+
+/* ─── FILTER SIDEBAR + RESULTS ─── */
+.results-layout{display:grid;grid-template-columns:240px 1fr;gap:1.5rem;padding:1.5rem 2rem;max-width:1100px;margin:0 auto}
+
+.filter-panel{
+  background:#fff;border-radius:var(--radius-lg);padding:1.25rem;
+  border:1px solid var(--border);align-self:start;position:sticky;top:80px;
+}
+.filter-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:1rem;display:flex;justify-content:space-between;align-items:center}
+.filter-reset{font-size:12px;color:var(--sky);cursor:pointer;font-weight:400}
+.filter-section{margin-bottom:1.25rem;padding-bottom:1.25rem;border-bottom:1px solid var(--border)}
+.filter-section:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.filter-section h4{font-size:12px;text-transform:uppercase;letter-spacing:0.6px;color:var(--muted);margin-bottom:0.75rem;font-weight:600}
+.filter-opt{display:flex;align-items:center;gap:8px;margin-bottom:6px;cursor:pointer}
+.filter-opt input{accent-color:var(--sky);cursor:pointer}
+.filter-opt label{font-size:13px;color:var(--text);cursor:pointer;flex:1}
+.filter-opt span{font-size:12px;color:var(--muted)}
+.range-slider{width:100%;accent-color:var(--sky);cursor:pointer}
+.range-val{font-size:12px;color:var(--muted);margin-top:4px}
+.time-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.time-pill{
+  padding:6px 8px;border:1px solid var(--border);border-radius:6px;
+  font-size:11px;text-align:center;cursor:pointer;transition:all 0.2s;color:var(--muted);
+}
+.time-pill.active,.time-pill:hover{border-color:var(--sky);color:var(--sky);background:var(--sky-light)}
+
+.results-panel{}
+.results-bar{
+  background:#fff;border-radius:var(--radius);padding:12px 16px;
+  border:1px solid var(--border);margin-bottom:12px;
+  display:flex;justify-content:space-between;align-items:center;
+}
+.results-info{font-size:13px;color:var(--muted)}
+.results-info strong{color:var(--text)}
+.sort-row{display:flex;gap:8px}
+.sort-btn{
+  padding:5px 12px;border:1px solid var(--border);border-radius:6px;
+  font-size:12px;cursor:pointer;background:#fff;color:var(--muted);
+  font-family:var(--font-body);transition:all 0.2s;
+}
+.sort-btn.active,.sort-btn:hover{border-color:var(--sky);color:var(--sky);background:var(--sky-light)}
+
+.flight-card{
+  background:#fff;border-radius:var(--radius-lg);padding:1.25rem 1.5rem;
+  border:1px solid var(--border);margin-bottom:10px;
+  display:grid;grid-template-columns:auto 1fr auto 1fr auto 1fr;
+  align-items:center;gap:1rem;transition:all 0.2s;cursor:pointer;
+}
+.flight-card:hover{border-color:#b8cfe8;box-shadow:0 4px 20px rgba(26,58,92,0.1)}
+.flight-card.best{border-color:#b8cfe8;border-width:1.5px}
+.best-tag{
+  background:#e8f4fd;color:#1a3a5c;font-size:10px;font-weight:600;
+  padding:2px 8px;border-radius:10px;display:inline-block;margin-bottom:6px;letter-spacing:0.3px;
+}
+.al-logo{
+  width:40px;height:40px;border-radius:8px;display:flex;align-items:center;
+  justify-content:center;font-size:11px;font-weight:700;color:#fff;
+}
+.al-ai{background:#e8333c}.al-6e{background:#1a75cf}.al-uk{background:#e87722}.al-sg{background:#8e24aa}
+.al-nm{font-size:9px;color:var(--muted);margin-top:3px;text-align:center}
+
+.fc-time{font-size:22px;font-weight:700;color:var(--text);font-family:var(--font-display)}
+.fc-code{font-size:12px;color:var(--muted)}
+.fc-dur{text-align:center}
+.dur-line{display:flex;align-items:center;gap:0;margin:4px 0}
+.dl-dot{width:7px;height:7px;border-radius:50%;background:#cdd5dc;flex-shrink:0}
+.dl-seg{flex:1;height:1px;background:#dce3ea}
+.dl-plane{font-size:13px;color:var(--muted);margin:0 4px}
+.dur-text{font-size:12px;color:var(--muted)}
+.stop-badge{font-size:10px;padding:2px 8px;border-radius:10px;display:inline-block;margin-top:2px}
+.ns{background:#eaf6ec;color:#2d7a3a}.os{background:#fdf3e0;color:#9a5d0a}.ts{background:#fdecea;color:#c0392b}
+
+.fc-price .price{font-size:24px;font-weight:700;color:var(--sky);font-family:var(--font-display)}
+.fc-price .per{font-size:11px;color:var(--muted)}
+.fc-price .old{font-size:12px;color:var(--danger);text-decoration:line-through;margin-bottom:2px}
+.btn-book{
+  display:block;width:100%;padding:10px 0;background:var(--sky);color:#fff;
+  border:none;border-radius:8px;font-size:13px;font-weight:600;
+  cursor:pointer;font-family:var(--font-body);margin-top:8px;transition:all 0.2s;
+}
+.btn-book:hover{background:var(--sky-mid)}
+
+/* ─── BOOKING FORM ─── */
+.booking-page{max-width:960px;margin:0 auto;padding:2rem}
+.booking-grid{display:grid;grid-template-columns:1fr 340px;gap:1.5rem;align-items:start}
+.form-card{background:#fff;border-radius:var(--radius-lg);border:1px solid var(--border);overflow:hidden}
+.form-card-head{background:var(--sky);padding:1rem 1.5rem;display:flex;align-items:center;gap:10px}
+.form-card-head i{color:#e8a020;font-size:20px}
+.form-card-head h3{font-family:var(--font-display);font-size:16px;font-weight:700;color:#fff}
+.form-card-head span{font-size:12px;color:rgba(255,255,255,0.6);margin-left:auto}
+.form-body{padding:1.5rem}
+.form-row{display:grid;gap:12px;margin-bottom:14px}
+.form-row.cols2{grid-template-columns:1fr 1fr}
+.form-row.cols3{grid-template-columns:1fr 1fr 1fr}
+.form-group{display:flex;flex-direction:column;gap:5px}
+.form-group label{font-size:11px;text-transform:uppercase;letter-spacing:0.6px;color:var(--muted);font-weight:600}
+.form-group input,.form-group select{
+  border:1px solid #dce3ea;border-radius:8px;padding:10px 12px;
+  font-size:14px;color:var(--text);font-family:var(--font-body);
+  outline:none;transition:border 0.2s;background:#fff;
+}
+.form-group input:focus,.form-group select:focus{border-color:var(--sky)}
+.form-group input::placeholder{color:#aaa}
+
+.add-pax{
+  display:flex;align-items:center;gap:8px;padding:10px 14px;
+  border:1px dashed #b8cfe8;border-radius:8px;cursor:pointer;
+  color:var(--sky);font-size:13px;font-weight:500;background:#f8fbff;
+  transition:all 0.2s;margin-bottom:1rem;
+}
+.add-pax:hover{background:var(--sky-light)}
+
+.seat-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin:8px 0}
+.seat{
+  aspect-ratio:1;border-radius:4px;display:flex;align-items:center;justify-content:center;
+  font-size:10px;cursor:pointer;transition:all 0.15s;border:1px solid #dce3ea;
+}
+.seat.free{background:#eaf6ec;color:#2d7a3a;border-color:#b8e2c0}
+.seat.taken{background:#f0f0f0;color:#ccc;cursor:not-allowed;border-color:#e0e0e0}
+.seat.selected{background:var(--sky);color:#fff;border-color:var(--sky)}
+.seat-legend{display:flex;gap:12px;font-size:11px;color:var(--muted);margin-top:6px}
+.seat-legend span{display:flex;align-items:center;gap:5px}
+.seat-dot{width:10px;height:10px;border-radius:2px}
+.seat-aisle{grid-column:4;background:transparent;border:none;cursor:default}
+
+.section-divider{border:none;border-top:1px solid var(--border);margin:1.25rem 0}
+
+/* ─── ORDER SUMMARY ─── */
+.order-card{background:#fff;border-radius:var(--radius-lg);border:1px solid var(--border);position:sticky;top:80px}
+.order-head{padding:1rem 1.5rem;border-bottom:1px solid var(--border)}
+.order-head h3{font-family:var(--font-display);font-size:16px;font-weight:700}
+.flight-summary{padding:1rem 1.5rem;border-bottom:1px solid var(--border)}
+.fs-route{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.fs-city{font-size:16px;font-weight:700;color:var(--text)}
+.fs-arrow{color:var(--muted)}
+.fs-details{font-size:12px;color:var(--muted);line-height:1.7}
+.price-breakdown{padding:1rem 1.5rem;border-bottom:1px solid var(--border)}
+.pb-row{display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px;color:var(--muted)}
+.pb-row.total{font-weight:700;color:var(--text);font-size:15px;margin-top:4px;padding-top:8px;border-top:1px solid var(--border)}
+.promo-row{padding:1rem 1.5rem;border-bottom:1px solid var(--border);display:flex;gap:8px}
+.promo-input{
+  flex:1;border:1px solid #dce3ea;border-radius:8px;padding:9px 12px;
+  font-size:13px;font-family:var(--font-body);outline:none;color:var(--text);
+}
+.promo-input:focus{border-color:var(--sky)}
+.btn-apply{
+  padding:9px 16px;background:#f4f7fa;border:1px solid #dce3ea;
+  border-radius:8px;font-size:13px;cursor:pointer;font-family:var(--font-body);color:var(--sky);font-weight:600;
+}
+.btn-apply:hover{background:var(--sky-light)}
+.pay-btn{
+  display:block;width:100%;padding:14px;background:var(--sky);color:#fff;
+  border:none;border-radius:10px;font-size:15px;font-weight:700;
+  cursor:pointer;font-family:var(--font-body);margin:1.25rem;
+  width:calc(100% - 2.5rem);transition:all 0.2s;
+}
+.pay-btn:hover{background:var(--sky-mid);transform:translateY(-1px)}
+.secure-note{text-align:center;font-size:11px;color:var(--muted);padding:0 1.5rem 1rem;display:flex;align-items:center;justify-content:center;gap:5px}
+
+/* ─── PAYMENT PAGE ─── */
+.payment-page{max-width:960px;margin:0 auto;padding:2rem}
+.payment-grid{display:grid;grid-template-columns:1fr 320px;gap:1.5rem}
+.pay-methods{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:1.5rem}
+.pay-method{
+  padding:10px 20px;font-size:13px;cursor:pointer;border:none;background:none;
+  color:var(--muted);border-bottom:2px solid transparent;font-family:var(--font-body);
+  display:flex;align-items:center;gap:6px;transition:all 0.2s;margin-bottom:-1px;
+}
+.pay-method.active{color:var(--sky);border-bottom-color:var(--sky);font-weight:500}
+.card-preview{
+  background:linear-gradient(135deg,#1a3a5c,#2e5f8a);
+  border-radius:14px;padding:1.5rem;margin-bottom:1.5rem;color:#fff;
+  position:relative;overflow:hidden;
+}
+.card-preview::before{
+  content:'';position:absolute;top:-60px;right:-60px;
+  width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,0.05);
+}
+.card-chip{width:36px;height:28px;background:#e8a020;border-radius:4px;margin-bottom:1.5rem}
+.card-number{font-size:18px;letter-spacing:3px;margin-bottom:1rem;font-weight:300}
+.card-row{display:flex;justify-content:space-between;font-size:12px;opacity:0.7}
+.card-name{font-size:14px;font-weight:500}
+
+.upi-logos{display:flex;gap:10px;margin-bottom:1rem}
+.upi-logo{
+  width:70px;height:40px;border:1px solid var(--border);border-radius:8px;
+  display:flex;align-items:center;justify-content:center;font-size:12px;
+  font-weight:700;cursor:pointer;transition:all 0.2s;background:#fff;
+}
+.upi-logo:hover,.upi-logo.active{border-color:var(--sky);color:var(--sky)}
+.upi-logo.gpay{color:#4285f4}.upi-logo.paytm{color:#00b9f5}.upi-logo.phonePe{color:#5f259f}
+
+/* ─── CONFIRMATION PAGE ─── */
+.confirm-page{max-width:680px;margin:0 auto;padding:3rem 2rem;text-align:center}
+.confirm-icon{
+  width:80px;height:80px;background:#eaf6ec;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 1.5rem;font-size:36px;color:#2d7a3a;
+}
+.confirm-title{font-family:var(--font-display);font-size:30px;font-weight:700;margin-bottom:0.5rem}
+.confirm-sub{color:var(--muted);font-size:14px;margin-bottom:2rem}
+.pnr-box{
+  background:var(--sky);color:#fff;border-radius:var(--radius-lg);
+  padding:1.5rem;margin-bottom:1.5rem;
+}
+.pnr-label{font-size:12px;opacity:0.7;margin-bottom:4px}
+.pnr-code{font-family:var(--font-display);font-size:36px;font-weight:900;letter-spacing:4px}
+.ticket-card{
+  background:#fff;border-radius:var(--radius-lg);border:1px solid var(--border);
+  margin-bottom:1.5rem;overflow:hidden;text-align:left;
+}
+.ticket-head{
+  background:#f4f7fa;padding:1rem 1.5rem;display:flex;
+  justify-content:space-between;align-items:center;
+  border-bottom:1px solid var(--border);
+}
+.ticket-body{padding:1.5rem;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:1rem}
+.tkt-time{font-size:28px;font-weight:700;font-family:var(--font-display)}
+.tkt-city{font-size:13px;color:var(--muted)}
+.tkt-dur{text-align:center}
+.tkt-date-row{padding:0 1.5rem 1rem;display:flex;gap:2rem;font-size:13px}
+.tkt-meta{color:var(--muted)}.tkt-val{font-weight:600;color:var(--text)}
+.ticket-footer{
+  border-top:1px dashed var(--border);padding:1rem 1.5rem;
+  display:flex;justify-content:space-between;align-items:center;
+}
+
+/* ─── PROFILE / MY BOOKINGS ─── */
+.profile-page{max-width:900px;margin:0 auto;padding:2rem}
+.profile-grid{display:grid;grid-template-columns:240px 1fr;gap:1.5rem}
+.profile-sidebar{
+  background:#fff;border-radius:var(--radius-lg);border:1px solid var(--border);
+  padding:1.5rem;align-self:start;
+}
+.avatar{
+  width:64px;height:64px;border-radius:50%;background:var(--sky);
+  display:flex;align-items:center;justify-content:center;
+  font-size:24px;font-weight:700;color:#fff;margin:0 auto 1rem;
+}
+.profile-name{text-align:center;font-weight:600;font-size:16px;margin-bottom:4px}
+.profile-email{text-align:center;font-size:12px;color:var(--muted);margin-bottom:1.25rem}
+.profile-nav{list-style:none}
+.profile-nav li{
+  padding:9px 12px;border-radius:8px;cursor:pointer;font-size:13px;
+  display:flex;align-items:center;gap:8px;color:var(--muted);transition:all 0.2s;margin-bottom:2px;
+}
+.profile-nav li:hover,.profile-nav li.active{background:var(--sky-light);color:var(--sky)}
+.profile-nav li i{font-size:16px}
+
+.booking-list{display:flex;flex-direction:column;gap:12px}
+.bk-card{
+  background:#fff;border-radius:var(--radius-lg);border:1px solid var(--border);
+  padding:1.25rem 1.5rem;display:grid;
+  grid-template-columns:auto 1fr auto;gap:1rem;align-items:center;
+}
+.bk-status{font-size:11px;font-weight:600;padding:3px 10px;border-radius:10px;display:inline-block}
+.bk-upcoming{background:#e8f4fd;color:#1a3a5c}
+.bk-completed{background:#eaf6ec;color:#2d7a3a}
+.bk-cancelled{background:#fdecea;color:#c0392b}
+.bk-route{font-size:16px;font-weight:700;font-family:var(--font-display);margin:4px 0}
+.bk-info{font-size:12px;color:var(--muted)}
+.bk-price{font-size:20px;font-weight:700;color:var(--sky);font-family:var(--font-display);text-align:right}
+.bk-pnr{font-size:11px;color:var(--muted);text-align:right}
+
+/* ─── AUTH ─── */
+.auth-page{min-height:calc(100vh - 60px);display:flex;align-items:center;justify-content:center;padding:2rem;background:var(--bg)}
+.auth-box{
+  background:#fff;border-radius:var(--radius-lg);border:1px solid var(--border);
+  padding:2.5rem;width:100%;max-width:440px;
+}
+.auth-logo{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:1.5rem}
+.auth-logo i{color:var(--sky);font-size:28px}
+.auth-logo span{font-family:var(--font-display);font-size:26px;font-weight:700;color:var(--sky)}
+.auth-title{font-family:var(--font-display);font-size:22px;font-weight:700;text-align:center;margin-bottom:4px}
+.auth-sub{font-size:13px;color:var(--muted);text-align:center;margin-bottom:1.5rem}
+.auth-social{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1.25rem}
+.btn-social{
+  padding:10px;border:1px solid var(--border);border-radius:8px;background:#fff;
+  font-size:13px;cursor:pointer;font-family:var(--font-body);color:var(--text);
+  display:flex;align-items:center;justify-content:center;gap:8px;transition:all 0.2s;
+}
+.btn-social:hover{background:var(--bg);border-color:#b0c0d0}
+.auth-divider{text-align:center;font-size:12px;color:var(--muted);margin:1rem 0;position:relative}
+.auth-divider::before,.auth-divider::after{
+  content:'';position:absolute;top:50%;width:42%;height:1px;background:var(--border);
+}
+.auth-divider::before{left:0}.auth-divider::after{right:0}
+.auth-form{display:flex;flex-direction:column;gap:12px}
+.auth-form .form-group label{font-size:12px}
+.auth-submit{
+  padding:12px;background:var(--sky);color:#fff;border:none;border-radius:8px;
+  font-size:14px;font-weight:600;cursor:pointer;font-family:var(--font-body);margin-top:4px;
+  transition:all 0.2s;
+}
+.auth-submit:hover{background:var(--sky-mid)}
+.auth-switch{text-align:center;font-size:13px;color:var(--muted);margin-top:1rem}
+.auth-switch a{color:var(--sky);cursor:pointer;font-weight:500;text-decoration:none}
+
+/* ─── FEATURES STRIP ─── */
+.features-strip{background:#fff;border-top:1px solid var(--border);padding:1.5rem 2rem}
+.features-inner{max-width:960px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:1rem}
+.feat{display:flex;align-items:flex-start;gap:12px}
+.feat-icon{font-size:22px;color:var(--sky);flex-shrink:0;margin-top:2px}
+.feat-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:2px}
+.feat-desc{font-size:12px;color:var(--muted)}
+
+/* ─── FOOTER ─── */
+footer{background:#0d2b47;padding:2rem;color:rgba(255,255,255,0.6);font-size:13px}
+.footer-inner{max-width:960px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:2rem}
+.footer-brand{font-family:var(--font-display);font-size:20px;color:#fff;font-weight:700;display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.footer-brand i{color:#e8a020}
+.footer-tagline{font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:1rem}
+.footer-col h4{font-size:12px;text-transform:uppercase;letter-spacing:0.8px;color:rgba(255,255,255,0.4);margin-bottom:10px;font-weight:600}
+.footer-col a{display:block;color:rgba(255,255,255,0.6);font-size:13px;margin-bottom:6px;cursor:pointer;text-decoration:none;transition:color 0.2s}
+.footer-col a:hover{color:#fff}
+.footer-bottom{max-width:960px;margin:1.5rem auto 0;padding-top:1rem;border-top:1px solid rgba(255,255,255,0.1);display:flex;justify-content:space-between;align-items:center;font-size:12px}
+
+/* ─── UTILS ─── */
+.breadcrumb{display:flex;align-items:center;gap:6px;padding:1rem 2rem;font-size:13px;color:var(--muted);max-width:1100px;margin:0 auto}
+.breadcrumb span{cursor:pointer;transition:color 0.2s}.breadcrumb span:hover{color:var(--sky)}
+.breadcrumb i{font-size:14px}
+.tag{padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;display:inline-block}
+.tag-info{background:#e8f4fd;color:#1a3a5c}
+.tag-gold{background:#fdf3e0;color:#9a5d0a}
+hr.divider{border:none;border-top:1px solid var(--border);margin:1rem 0}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════ NAVBAR ═══════════════════════════════ -->
+<nav>
+  <div class="brand" onclick="goto('home')">
+    <i class="ti ti-plane"></i>
+    <span class="brand-name">SkyFly</span>
+  </div>
+  <div class="nav-links">
+    <div class="nav-link active" onclick="goto('home')">Home</div>
+    <div class="nav-link" onclick="goto('results')">Search Flights</div>
+    <div class="nav-link" onclick="goto('profile')">My Bookings</div>
+    <div class="nav-link">Offers</div>
+  </div>
+  <div class="nav-right">
+    <button class="btn-login" onclick="goto('login')">Log in</button>
+    <button class="btn-signup" onclick="goto('signup')">Sign up</button>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════ PAGE: HOME ═══════════════════════════════ -->
+<div id="page-home" class="page active">
+  <div class="hero">
+    <div class="hero-inner">
+      <h1>Where do you<br>want to fly?</h1>
+      <p class="hero-sub">Compare fares across 200+ airlines · Best price guarantee</p>
+      <div class="search-box">
+        <div class="trip-tabs">
+          <button class="trip-tab active" onclick="setTripTab(this)">One way</button>
+          <button class="trip-tab" onclick="setTripTab(this)">Round trip</button>
+          <button class="trip-tab" onclick="setTripTab(this)">Multi-city</button>
+        </div>
+        <div class="search-row">
+          <div class="sf">
+            <label>From</label>
+            <div class="sf-input">
+              <i class="ti ti-map-pin"></i>
+              <div class="sf-val">Jaipur <small>JAI · Jaipur Int'l</small></div>
+            </div>
+          </div>
+          <button class="swap-btn" onclick="swapCities()" title="Swap cities"><i class="ti ti-arrows-right-left" style="font-size:15px"></i></button>
+          <div class="sf">
+            <label>To</label>
+            <div class="sf-input">
+              <i class="ti ti-map-pin"></i>
+              <div class="sf-val" id="h-dest">Mumbai <small>BOM · Chhatrapati Shivaji</small></div>
+            </div>
+          </div>
+          <div class="sf">
+            <label>Depart</label>
+            <div class="sf-input" id="depart-picker">
+              <i class="ti ti-calendar"></i>
+              <div class="sf-val" id="depart-lbl">15 May 2026 <small>Friday</small></div>
+            </div>
+          </div>
+          <div class="sf">
+            <label>Travellers</label>
+            <div class="sf-input">
+              <i class="ti ti-users"></i>
+              <div class="sf-val">
+                <select style="width:100%;border:none;outline:none;background:transparent;font-family:var(--font-body);font-size:14px;font-weight:500;color:var(--text)">
+                  <option>1 Adult · Economy</option>
+                  <option>2 Adults · Economy</option>
+                  <option>1 Adult · Business</option>
+                  <option>Family (4)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <button class="btn-search" onclick="goto('results')"><i class="ti ti-search"></i>Search</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-head"><h2>Popular routes from Jaipur</h2><p>Updated daily — best fares guaranteed</p></div>
+    <div class="dest-grid">
+      <div class="dest-card" onclick="goto('results')">
+        <div class="dest-img bg1"><div class="dest-overlay"></div><span class="dest-city">Delhi</span></div>
+        <div class="dest-body"><span class="dest-route">JAI → DEL · 55 min</span><span class="dest-price">from ₹1,899</span></div>
+      </div>
+      <div class="dest-card" onclick="goto('results')">
+        <div class="dest-img bg2"><div class="dest-overlay"></div><span class="dest-city">Mumbai</span></div>
+        <div class="dest-body"><span class="dest-route">JAI → BOM · 1h 55m</span><span class="dest-price">from ₹3,499</span></div>
+      </div>
+      <div class="dest-card" onclick="goto('results')">
+        <div class="dest-img bg3"><div class="dest-overlay"></div><span class="dest-city">Bengaluru</span></div>
+        <div class="dest-body"><span class="dest-route">JAI → BLR · 2h 10m</span><span class="dest-price">from ₹4,199</span></div>
+      </div>
+      <div class="dest-card" onclick="goto('results')">
+        <div class="dest-img bg4"><div class="dest-overlay"></div><span class="dest-city">Kolkata</span></div>
+        <div class="dest-body"><span class="dest-route">JAI → CCU · 2h 30m</span><span class="dest-price">from ₹4,890</span></div>
+      </div>
+      <div class="dest-card" onclick="goto('results')">
+        <div class="dest-img bg5"><div class="dest-overlay"></div><span class="dest-city">Hyderabad</span></div>
+        <div class="dest-body"><span class="dest-route">JAI → HYD · 2h 5m</span><span class="dest-price">from ₹3,750</span></div>
+      </div>
+      <div class="dest-card" onclick="goto('results')">
+        <div class="dest-img bg6"><div class="dest-overlay"></div><span class="dest-city">Chennai</span></div>
+        <div class="dest-body"><span class="dest-route">JAI → MAA · 2h 25m</span><span class="dest-price">from ₹4,620</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="features-strip">
+    <div class="features-inner">
+      <div class="feat"><i class="ti ti-shield-check feat-icon"></i><div><div class="feat-title">Secure payments</div><div class="feat-desc">256-bit SSL encrypted, PCI-DSS compliant</div></div></div>
+      <div class="feat"><i class="ti ti-headset feat-icon"></i><div><div class="feat-title">24/7 support</div><div class="feat-desc">Call, chat, or email — always available</div></div></div>
+      <div class="feat"><i class="ti ti-coin feat-icon"></i><div><div class="feat-title">Best price guarantee</div><div class="feat-desc">We match any lower fare you find</div></div></div>
+      <div class="feat"><i class="ti ti-refresh feat-icon"></i><div><div class="feat-title">Free cancellation</div><div class="feat-desc">Cancel up to 24h before departure</div></div></div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-inner">
+      <div>
+        <div class="footer-brand"><i class="ti ti-plane"></i>SkyFly</div>
+        <div class="footer-tagline">India's smartest way to book flights</div>
+        <div style="font-size:12px">College project · Built with ❤️</div>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <a>About us</a><a>Careers</a><a>Press</a><a>Blog</a>
+      </div>
+      <div class="footer-col">
+        <h4>Support</h4>
+        <a>Help centre</a><a>Contact us</a><a>Cancellation</a><a>Baggage</a>
+      </div>
+      <div class="footer-col">
+        <h4>Legal</h4>
+        <a>Privacy policy</a><a>Terms of service</a><a>Cookie policy</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 SkyFly Technologies Pvt Ltd · College Project Demo</span>
+      <span>Made in Jaipur 🇮🇳</span>
+    </div>
+  </footer>
+</div>
+
+<!-- ═══════════════════════════════ PAGE: SEARCH RESULTS ═══════════════════════════════ -->
+<div id="page-results" class="page">
+  <!-- mini search bar -->
+  <div style="background:#0d2b47;padding:1rem 2rem">
+    <div style="max-width:1100px;margin:0 auto;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+      <div class="sf-input" style="background:rgba(255,255,255,0.1);border-color:rgba(255,255,255,0.2);flex:0 0 auto;cursor:pointer">
+        <i class="ti ti-map-pin" style="color:rgba(255,255,255,0.6)"></i>
+        <span style="font-size:13px;font-weight:600;color:#fff">JAI → BOM</span>
+      </div>
+      <div class="sf-input" style="background:rgba(255,255,255,0.1);border-color:rgba(255,255,255,0.2);flex:0 0 auto">
+        <i class="ti ti-calendar" style="color:rgba(255,255,255,0.6)"></i>
+        <span style="font-size:13px;color:#fff">15 May 2026</span>
+      </div>
+      <div class="sf-input" style="background:rgba(255,255,255,0.1);border-color:rgba(255,255,255,0.2);flex:0 0 auto">
+        <i class="ti ti-users" style="color:rgba(255,255,255,0.6)"></i>
+        <span style="font-size:13px;color:#fff">1 Adult · Economy</span>
+      </div>
+      <button class="btn-search" style="margin-left:auto" onclick="goto('results')"><i class="ti ti-refresh"></i>Modify</button>
+    </div>
+  </div>
+
+  <div class="breadcrumb">
+    <span onclick="goto('home')">Home</span>
+    <i class="ti ti-chevron-right"></i>
+    <span>Flight results</span>
+  </div>
+
+  <div class="results-layout">
+    <!-- FILTERS -->
+    <div class="filter-panel">
+      <div class="filter-title">Filters <span class="filter-reset">Reset all</span></div>
+
+      <div class="filter-section">
+        <h4>Stops</h4>
+        <label class="filter-opt"><input type="checkbox" checked><label>Nonstop only</label><span>(2)</span></label>
+        <label class="filter-opt"><input type="checkbox" checked><label>1 stop</label><span>(4)</span></label>
+        <label class="filter-opt"><input type="checkbox"><label>2+ stops</label><span>(1)</span></label>
+      </div>
+
+      <div class="filter-section">
+        <h4>Price range</h4>
+        <input type="range" class="range-slider" min="2000" max="12000" value="10000" oninput="document.getElementById('price-val').textContent='₹'+this.value.toLocaleString('en-IN')">
+        <div class="range-val">Up to <strong id="price-val">₹10,000</strong></div>
+      </div>
+
+      <div class="filter-section">
+        <h4>Departure time</h4>
+        <div class="time-grid">
+          <div class="time-pill active" onclick="togglePill(this)">00–06<br><small>Dawn</small></div>
+          <div class="time-pill active" onclick="togglePill(this)">06–12<br><small>Morning</small></div>
+          <div class="time-pill" onclick="togglePill(this)">12–18<br><small>Afternoon</small></div>
+          <div class="time-pill" onclick="togglePill(this)">18–24<br><small>Evening</small></div>
+        </div>
+      </div>
+
+      <div class="filter-section">
+        <h4>Airlines</h4>
+        <label class="filter-opt"><input type="checkbox" checked><label>Air India</label><span>(3)</span></label>
+        <label class="filter-opt"><input type="checkbox" checked><label>IndiGo</label><span>(5)</span></label>
+        <label class="filter-opt"><input type="checkbox" checked><label>Vistara</label><span>(2)</span></label>
+        <label class="filter-opt"><input type="checkbox"><label>SpiceJet</label><span>(2)</span></label>
+      </div>
+
+      <div class="filter-section">
+        <h4>Duration</h4>
+        <input type="range" class="range-slider" min="60" max="480" value="360" oninput="document.getElementById('dur-val').textContent=Math.floor(this.value/60)+'h '+((this.value%60)||'00')+'m'">
+        <div class="range-val">Up to <strong id="dur-val">6h 00m</strong></div>
+      </div>
+
+      <div class="filter-section">
+        <h4>Fare type</h4>
+        <label class="filter-opt"><input type="radio" name="fare" checked><label>All fares</label></label>
+        <label class="filter-opt"><input type="radio" name="fare"><label>Refundable only</label></label>
+        <label class="filter-opt"><input type="radio" name="fare"><label>Student fare</label></label>
+      </div>
+    </div>
+
+    <!-- RESULTS -->
+    <div class="results-panel">
+      <div class="results-bar">
+        <div class="results-info"><strong>JAI → BOM</strong> · 15 May · <strong>7 flights</strong> found</div>
+        <div class="sort-row">
+          <button class="sort-btn active" onclick="setSort(this)">Cheapest</button>
+          <button class="sort-btn" onclick="setSort(this)">Fastest</button>
+          <button class="sort-btn" onclick="setSort(this)">Earliest</button>
+        </div>
+      </div>
+
+      <!-- Flight 1 -->
+      <div class="flight-card best" onclick="goto('booking')">
+        <div>
+          <div class="best-tag">Best value</div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <div class="al-logo al-6e">6E</div>
+            <div><div style="font-size:13px;font-weight:600">IndiGo</div><div style="font-size:11px;color:var(--muted)">6E 2108</div></div>
+          </div>
+        </div>
+        <div><div class="fc-time">06:10</div><div class="fc-code">JAI</div></div>
+        <div class="fc-dur">
+          <div class="dur-line"><div class="dl-dot"></div><div class="dl-seg"></div><i class="ti ti-plane dl-plane"></i><div class="dl-seg"></div><div class="dl-dot"></div></div>
+          <div class="dur-text">1h 55m</div>
+          <span class="stop-badge ns">Nonstop</span>
+        </div>
+        <div><div class="fc-time">08:05</div><div class="fc-code">BOM</div></div>
+        <div style="font-size:12px;color:var(--muted)">Economy<br>15 kg bag<br><span style="color:#2d7a3a;font-size:11px">✓ Refundable</span></div>
+        <div class="fc-price">
+          <div class="old">₹4,500</div>
+          <div class="price">₹3,890</div>
+          <div class="per">per person</div>
+          <button class="btn-book" onclick="event.stopPropagation();goto('booking')">Select →</button>
+        </div>
+      </div>
+
+      <!-- Flight 2 -->
+      <div class="flight-card" onclick="goto('booking')">
+        <div>
+          <div class="al-logo al-ai">AI</div>
+          <div style="font-size:11px;color:var(--muted);text-align:center;margin-top:3px">Air India<br>AI 445</div>
+        </div>
+        <div><div class="fc-time">08:30</div><div class="fc-code">JAI</div></div>
+        <div class="fc-dur">
+          <div class="dur-line"><div class="dl-dot"></div><div class="dl-seg"></div><i class="ti ti-plane dl-plane"></i><div class="dl-seg"></div><div class="dl-dot"></div></div>
+          <div class="dur-text">2h 05m</div>
+          <span class="stop-badge ns">Nonstop</span>
+        </div>
+        <div><div class="fc-time">10:35</div><div class="fc-code">BOM</div></div>
+        <div style="font-size:12px;color:var(--muted)">Economy<br>25 kg bag<br><span style="color:#2d7a3a;font-size:11px">✓ Refundable</span></div>
+        <div class="fc-price">
+          <div class="price">₹4,250</div>
+          <div class="per">per person</div>
+          <button class="btn-book" onclick="event.stopPropagation();goto('booking')">Select →</button>
+        </div>
+      </div>
+
+      <!-- Flight 3 -->
+      <div class="flight-card" onclick="goto('booking')">
+        <div>
+          <div class="al-logo al-uk">UK</div>
+          <div style="font-size:11px;color:var(--muted);text-align:center;margin-top:3px">Vistara<br>UK 695</div>
+        </div>
+        <div><div class="fc-time">11:15</div><div class="fc-code">JAI</div></div>
+        <div class="fc-dur">
+          <div class="dur-line"><div class="dl-dot"></div><div class="dl-seg"></div><i class="ti ti-plane dl-plane"></i><div class="dl-seg"></div><div class="dl-dot"></div></div>
+          <div class="dur-text">2h 20m</div>
+          <span class="stop-badge ns">Nonstop</span>
+        </div>
+        <div><div class="fc-time">13:35</div><div class="fc-code">BOM</div></div>
+        <div style="font-size:12px;color:var(--muted)">Business<br>30 kg bag<br><span style="color:#2d7a3a;font-size:11px">✓ Refundable</span></div>
+        <div class="fc-price">
+          <div class="price">₹8,900</div>
+          <div class="per">per person</div>
+          <button class="btn-book" onclick="event.stopPropagation();goto('booking')">Select →</button>
+        </div>
+      </div>
+
+      <!-- Flight 4 -->
+      <div class="flight-card" onclick="goto('booking')">
+        <div>
+          <div class="al-logo al-ai">AI</div>
+          <div style="font-size:11px;color:var(--muted);text-align:center;margin-top:3px">Air India<br>AI 879</div>
+        </div>
+        <div><div class="fc-time">14:20</div><div class="fc-code">JAI</div></div>
+        <div class="fc-dur">
+          <div class="dur-line"><div class="dl-dot"></div><div class="dl-seg"></div><i class="ti ti-plane dl-plane"></i><div class="dl-seg"></div><div class="dl-dot"></div></div>
+          <div class="dur-text">3h 50m</div>
+          <span class="stop-badge os">1 stop · DEL</span>
+        </div>
+        <div><div class="fc-time">18:10</div><div class="fc-code">BOM</div></div>
+        <div style="font-size:12px;color:var(--muted)">Economy<br>15 kg bag<br><span style="color:var(--danger);font-size:11px">✗ Non-refundable</span></div>
+        <div class="fc-price">
+          <div class="price">₹3,150</div>
+          <div class="per">per person</div>
+          <button class="btn-book" onclick="event.stopPropagation();goto('booking')">Select →</button>
+        </div>
+      </div>
+
+      <!-- Flight 5 -->
+      <div class="flight-card" onclick="goto('booking')">
+        <div>
+          <div class="al-logo al-sg">SG</div>
+          <div style="font-size:11px;color:var(--muted);text-align:center;margin-top:3px">SpiceJet<br>SG 434</div>
+        </div>
+        <div><div class="fc-time">19:45</div><div class="fc-code">JAI</div></div>
+        <div class="fc-dur">
+          <div class="dur-line"><div class="dl-dot"></div><div class="dl-seg"></div><i class="ti ti-plane dl-plane"></i><div class="dl-seg"></div><div class="dl-dot"></div></div>
+          <div class="dur-text">2h 00m</div>
+          <span class="stop-badge ns">Nonstop</span>
+        </div>
+        <div><div class="fc-time">21:45</div><div class="fc-code">BOM</div></div>
+        <div style="font-size:12px;color:var(--muted)">Economy<br>15 kg bag<br><span style="color:var(--danger);font-size:11px">✗ Non-refundable</span></div>
+        <div class="fc-price">
+          <div class="price">₹3,420</div>
+          <div class="per">per person</div>
+          <button class="btn-book" onclick="event.stopPropagation();goto('booking')">Select →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ PAGE: BOOKING FORM ═══════════════════════════════ -->
+<div id="page-booking" class="page">
+  <div class="breadcrumb">
+    <span onclick="goto('home')">Home</span><i class="ti ti-chevron-right"></i>
+    <span onclick="goto('results')">Results</span><i class="ti ti-chevron-right"></i>
+    <span style="color:var(--sky)">Passenger details</span>
+  </div>
+
+  <div class="booking-page">
+    <!-- progress bar -->
+    <div style="display:flex;align-items:center;gap:0;margin-bottom:2rem">
+      <div style="display:flex;align-items:center;gap:8px;flex:1">
+        <div style="width:28px;height:28px;border-radius:50%;background:var(--sky);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600">1</div>
+        <span style="font-size:13px;font-weight:600;color:var(--sky)">Passenger details</span>
+      </div>
+      <div style="flex:1;height:2px;background:#dce3ea"></div>
+      <div style="display:flex;align-items:center;gap:8px;flex:1">
+        <div style="width:28px;height:28px;border-radius:50%;background:#dce3ea;color:var(--muted);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600">2</div>
+        <span style="font-size:13px;color:var(--muted)">Seat selection</span>
+      </div>
+      <div style="flex:1;height:2px;background:#dce3ea"></div>
+      <div style="display:flex;align-items:center;gap:8px;flex:1">
+        <div style="width:28px;height:28px;border-radius:50%;background:#dce3ea;color:var(--muted);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600">3</div>
+        <span style="font-size:13px;color:var(--muted)">Payment</span>
+      </div>
+    </div>
+
+    <div class="booking-grid">
+      <div>
+        <!-- Passenger 1 -->
+        <div class="form-card" style="margin-bottom:1rem">
+          <div class="form-card-head">
+            <i class="ti ti-user"></i>
+            <h3>Passenger 1</h3>
+            <span>Adult</span>
+          </div>
+          <div class="form-body">
+            <div class="form-row cols3">
+              <div class="form-group">
+                <label>Title</label>
+                <select><option>Mr</option><option>Mrs</option><option>Ms</option><option>Dr</option></select>
+              </div>
+              <div class="form-group">
+                <label>First name</label>
+                <input type="text" placeholder="As on ID card">
+              </div>
+              <div class="form-group">
+                <label>Last name</label>
+                <input type="text" placeholder="As on ID card">
+              </div>
+            </div>
+            <div class="form-row cols2">
+              <div class="form-group">
+                <label>Date of birth</label>
+                <input type="date">
+              </div>
+              <div class="form-group">
+                <label>Nationality</label>
+                <select><option>Indian</option><option>American</option><option>British</option><option>Other</option></select>
+              </div>
+            </div>
+            <div class="form-row cols2">
+              <div class="form-group">
+                <label>Mobile number</label>
+                <input type="tel" placeholder="+91 00000 00000">
+              </div>
+              <div class="form-group">
+                <label>Email address</label>
+                <input type="email" placeholder="you@example.com">
+              </div>
+            </div>
+            <hr class="divider">
+            <p style="font-size:12px;color:var(--muted);margin-bottom:10px">Government-issued photo ID (for domestic flights)</p>
+            <div class="form-row cols2">
+              <div class="form-group">
+                <label>ID type</label>
+                <select><option>Aadhaar card</option><option>PAN card</option><option>Passport</option><option>Driving licence</option></select>
+              </div>
+              <div class="form-group">
+                <label>ID number</label>
+                <input type="text" placeholder="Enter ID number">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Add passenger -->
+        <div class="add-pax" onclick="alert('Passenger 2 form would expand here')">
+          <i class="ti ti-plus" style="font-size:16px"></i> Add another passenger
+        </div>
+
+        <!-- Seat selection -->
+        <div class="form-card" style="margin-bottom:1rem">
+          <div class="form-card-head">
+            <i class="ti ti-armchair"></i>
+            <h3>Select your seat</h3>
+            <span style="cursor:pointer;text-decoration:underline;opacity:0.7" onclick="alert('Skip seat')">Skip</span>
+          </div>
+          <div class="form-body">
+            <div style="display:flex;gap:2rem;margin-bottom:12px;font-size:12px;color:var(--muted)">
+              <span>✈ IndiGo 6E 2108 · JAI → BOM · Boeing 737</span>
+            </div>
+            <!-- Seat map -->
+            <div style="max-width:320px;margin:0 auto">
+              <div style="display:flex;gap:4px;margin-bottom:4px;justify-content:center">
+                <div style="width:36px;text-align:center;font-size:10px;color:var(--muted)">A</div>
+                <div style="width:36px;text-align:center;font-size:10px;color:var(--muted)">B</div>
+                <div style="width:36px;text-align:center;font-size:10px;color:var(--muted)">C</div>
+                <div style="width:20px"></div>
+                <div style="width:36px;text-align:center;font-size:10px;color:var(--muted)">D</div>
+                <div style="width:36px;text-align:center;font-size:10px;color:var(--muted)">E</div>
+                <div style="width:36px;text-align:center;font-size:10px;color:var(--muted)">F</div>
+              </div>
+              <div id="seat-map"></div>
+            </div>
+            <div class="seat-legend">
+              <span><div class="seat-dot" style="background:#eaf6ec;border:1px solid #b8e2c0"></div>Available</span>
+              <span><div class="seat-dot" style="background:#f0f0f0;border:1px solid #e0e0e0"></div>Taken</span>
+              <span><div class="seat-dot" style="background:var(--sky)"></div>Selected</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Add-ons -->
+        <div class="form-card" style="margin-bottom:1rem">
+          <div class="form-card-head"><i class="ti ti-backpack"></i><h3>Add-ons & extras</h3></div>
+          <div class="form-body">
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)">
+              <div><div style="font-size:13px;font-weight:500">Extra baggage — 5 kg</div><div style="font-size:12px;color:var(--muted)">Add up to 20 kg checked baggage</div></div>
+              <div style="display:flex;align-items:center;gap:10px"><span style="font-size:13px;color:var(--sky);font-weight:600">₹650</span><input type="checkbox" style="accent-color:var(--sky)"></div>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)">
+              <div><div style="font-size:13px;font-weight:500">Travel insurance</div><div style="font-size:12px;color:var(--muted)">Covers cancellation, delay & medical</div></div>
+              <div style="display:flex;align-items:center;gap:10px"><span style="font-size:13px;color:var(--sky);font-weight:600">₹349</span><input type="checkbox" style="accent-color:var(--sky)"></div>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0">
+              <div><div style="font-size:13px;font-weight:500">Meal preference</div><div style="font-size:12px;color:var(--muted)">Veg / Non-veg / Jain</div></div>
+              <select style="border:1px solid #dce3ea;border-radius:6px;padding:6px 10px;font-size:13px;font-family:var(--font-body);color:var(--text)">
+                <option>No preference</option><option>Vegetarian</option><option>Non-vegetarian</option><option>Jain</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <button class="btn-search" style="width:100%;justify-content:center;padding:14px;font-size:15px" onclick="goto('payment')">Continue to payment →</button>
+      </div>
+
+      <!-- ORDER SUMMARY -->
+      <div class="order-card">
+        <div class="order-head"><h3>Booking summary</h3></div>
+        <div class="flight-summary">
+          <div class="fs-route">
+            <span class="fs-city">JAI</span>
+            <i class="ti ti-arrow-right fs-arrow"></i>
+            <span class="fs-city">BOM</span>
+            <span class="tag tag-info" style="margin-left:auto">Nonstop</span>
+          </div>
+          <div class="fs-details">
+            IndiGo · 6E 2108<br>
+            15 May 2026 · 06:10 – 08:05<br>
+            Economy · 1 Adult<br>
+            Seat: 14A (window)
+          </div>
+        </div>
+        <div class="price-breakdown">
+          <div class="pb-row"><span>Base fare (1 adult)</span><span>₹3,290</span></div>
+          <div class="pb-row"><span>Taxes & fees</span><span>₹600</span></div>
+          <div class="pb-row"><span>Seat charge</span><span>₹200</span></div>
+          <div class="pb-row"><span>Convenience fee</span><span>₹149</span></div>
+          <div class="pb-row total"><span>Total payable</span><span>₹4,239</span></div>
+        </div>
+        <div class="promo-row">
+          <input class="promo-input" placeholder="Promo / coupon code">
+          <button class="btn-apply">Apply</button>
+        </div>
+        <button class="pay-btn" onclick="goto('payment')">Proceed to pay ₹4,239</button>
+        <p class="secure-note"><i class="ti ti-lock" style="font-size:14px"></i>100% secure · SSL encrypted</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ PAGE: PAYMENT ═══════════════════════════════ -->
+<div id="page-payment" class="page">
+  <div class="breadcrumb">
+    <span onclick="goto('home')">Home</span><i class="ti ti-chevron-right"></i>
+    <span onclick="goto('results')">Results</span><i class="ti ti-chevron-right"></i>
+    <span onclick="goto('booking')">Passenger details</span><i class="ti ti-chevron-right"></i>
+    <span style="color:var(--sky)">Payment</span>
+  </div>
+
+  <div class="payment-page">
+    <!-- progress bar -->
+    <div style="display:flex;align-items:center;gap:0;margin-bottom:2rem">
+      <div style="display:flex;align-items:center;gap:8px;flex:1">
+        <div style="width:28px;height:28px;border-radius:50%;background:#2d7a3a;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px"><i class="ti ti-check" style="font-size:14px"></i></div>
+        <span style="font-size:13px;color:#2d7a3a">Passenger details</span>
+      </div>
+      <div style="flex:1;height:2px;background:#2d7a3a"></div>
+      <div style="display:flex;align-items:center;gap:8px;flex:1">
+        <div style="width:28px;height:28px;border-radius:50%;background:#2d7a3a;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px"><i class="ti ti-check" style="font-size:14px"></i></div>
+        <span style="font-size:13px;color:#2d7a3a">Seat selection</span>
+      </div>
+      <div style="flex:1;height:2px;background:var(--sky)"></div>
+      <div style="display:flex;align-items:center;gap:8px;flex:1">
+        <div style="width:28px;height:28px;border-radius:50%;background:var(--sky);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600">3</div>
+        <span style="font-size:13px;font-weight:600;color:var(--sky)">Payment</span>
+      </div>
+    </div>
+
+    <div class="payment-grid">
+      <div>
+        <div class="form-card">
+          <div class="form-card-head"><i class="ti ti-credit-card"></i><h3>Choose payment method</h3></div>
+          <div class="form-body">
+            <div class="pay-methods">
+              <button class="pay-method active" onclick="setPayMethod(this,'card')"><i class="ti ti-credit-card"></i>Credit / Debit card</button>
+              <button class="pay-method" onclick="setPayMethod(this,'upi')"><i class="ti ti-qrcode"></i>UPI</button>
+              <button class="pay-method" onclick="setPayMethod(this,'nb')"><i class="ti ti-building-bank"></i>Net banking</button>
+              <button class="pay-method" onclick="setPayMethod(this,'wallet')"><i class="ti ti-wallet"></i>Wallets</button>
+            </div>
+
+            <!-- Card form -->
+            <div id="pay-card">
+              <div class="card-preview">
+                <div class="card-chip"></div>
+                <div class="card-number" id="card-num-preview">•••• •••• •••• ••••</div>
+                <div class="card-row">
+                  <div><div style="font-size:10px;opacity:0.6">CARD HOLDER</div><div class="card-name" id="card-name-preview">YOUR NAME</div></div>
+                  <div><div style="font-size:10px;opacity:0.6">VALID THRU</div><div class="card-name" id="card-exp-preview">MM/YY</div></div>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Card number</label>
+                  <input type="text" placeholder="1234 5678 9012 3456" maxlength="19" oninput="fmtCard(this)" onkeyup="document.getElementById('card-num-preview').textContent=this.value||'•••• •••• •••• ••••'">
+                </div>
+              </div>
+              <div class="form-row cols3">
+                <div class="form-group" style="grid-column:span 2">
+                  <label>Name on card</label>
+                  <input type="text" placeholder="As on card" oninput="document.getElementById('card-name-preview').textContent=this.value.toUpperCase()||'YOUR NAME'">
+                </div>
+                <div class="form-group">
+                  <label>Expiry</label>
+                  <input type="text" placeholder="MM/YY" maxlength="5" oninput="fmtExp(this)" onkeyup="document.getElementById('card-exp-preview').textContent=this.value||'MM/YY'">
+                </div>
+              </div>
+              <div class="form-row cols2">
+                <div class="form-group">
+                  <label>CVV</label>
+                  <input type="password" placeholder="•••" maxlength="4">
+                </div>
+                <div class="form-group">
+                  <label>Save card?</label>
+                  <select><option>Don't save</option><option>Save for future use</option></select>
+                </div>
+              </div>
+            </div>
+
+            <!-- UPI form -->
+            <div id="pay-upi" style="display:none">
+              <p style="font-size:13px;color:var(--muted);margin-bottom:12px">Pay using any UPI app</p>
+              <div class="upi-logos">
+                <div class="upi-logo gpay active" onclick="toggleUpi(this)">GPay</div>
+                <div class="upi-logo paytm" onclick="toggleUpi(this)">Paytm</div>
+                <div class="upi-logo phonePe" onclick="toggleUpi(this)">PhonePe</div>
+                <div class="upi-logo" onclick="toggleUpi(this)">BHIM</div>
+              </div>
+              <div class="form-group">
+                <label>Or enter UPI ID</label>
+                <input type="text" placeholder="yourname@upi">
+              </div>
+            </div>
+
+            <!-- Net banking -->
+            <div id="pay-nb" style="display:none">
+              <p style="font-size:13px;color:var(--muted);margin-bottom:12px">Select your bank</p>
+              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1rem">
+                <div class="time-pill" onclick="togglePill(this)" style="padding:10px">SBI</div>
+                <div class="time-pill" onclick="togglePill(this)" style="padding:10px">HDFC</div>
+                <div class="time-pill" onclick="togglePill(this)" style="padding:10px">ICICI</div>
+                <div class="time-pill" onclick="togglePill(this)" style="padding:10px">Axis</div>
+                <div class="time-pill" onclick="togglePill(this)" style="padding:10px">Kotak</div>
+                <div class="time-pill" onclick="togglePill(this)" style="padding:10px">PNB</div>
+              </div>
+              <div class="form-group">
+                <label>Or search your bank</label>
+                <input type="text" placeholder="Type bank name...">
+              </div>
+            </div>
+
+            <!-- Wallets -->
+            <div id="pay-wallet" style="display:none">
+              <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px">
+                <div class="time-pill active" onclick="togglePill(this)" style="padding:12px;font-size:12px">Paytm Wallet</div>
+                <div class="time-pill" onclick="togglePill(this)" style="padding:12px;font-size:12px">Amazon Pay</div>
+                <div class="time-pill" onclick="togglePill(this)" style="padding:12px;font-size:12px">Mobikwik</div>
+                <div class="time-pill" onclick="togglePill(this)" style="padding:12px;font-size:12px">Freecharge</div>
+              </div>
+            </div>
+
+            <button class="btn-search" style="width:100%;justify-content:center;padding:14px;font-size:15px;margin-top:1.5rem;border-radius:10px" onclick="goto('confirmation')">
+              <i class="ti ti-lock"></i>Pay securely ₹4,239
+            </button>
+            <p style="text-align:center;font-size:11px;color:var(--muted);margin-top:10px;display:flex;align-items:center;justify-content:center;gap:5px"><i class="ti ti-shield-check" style="font-size:14px;color:#2d7a3a"></i>256-bit SSL · PCI-DSS compliant · Safe checkout</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- SUMMARY (right) -->
+      <div>
+        <div class="order-card" style="position:static">
+          <div class="order-head"><h3>Order summary</h3></div>
+          <div class="flight-summary">
+            <div class="fs-route">
+              <span class="fs-city">JAI</span>
+              <i class="ti ti-arrow-right fs-arrow"></i>
+              <span class="fs-city">BOM</span>
+              <span class="tag tag-info" style="margin-left:auto">Nonstop</span>
+            </div>
+            <div class="fs-details">
+              IndiGo 6E 2108 · 15 May 2026<br>
+              06:10 → 08:05 · 1h 55m<br>
+              Economy · Seat 14A
+            </div>
+          </div>
+          <div class="price-breakdown">
+            <div class="pb-row"><span>Base fare</span><span>₹3,290</span></div>
+            <div class="pb-row"><span>Taxes & fees</span><span>₹600</span></div>
+            <div class="pb-row"><span>Seat + extras</span><span>₹200</span></div>
+            <div class="pb-row"><span>Convenience fee</span><span>₹149</span></div>
+            <div class="pb-row total"><span>Total</span><span>₹4,239</span></div>
+          </div>
+          <div style="padding:1rem 1.5rem">
+            <div style="background:#eaf6ec;border-radius:8px;padding:10px 12px;display:flex;gap:8px;align-items:flex-start">
+              <i class="ti ti-check" style="color:#2d7a3a;margin-top:1px"></i>
+              <div style="font-size:12px;color:#2d7a3a;line-height:1.6">Refundable ticket · Free cancellation up to 24h before departure · Instant e-ticket on email</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Offers -->
+        <div class="form-card" style="margin-top:12px">
+          <div class="form-card-head" style="background:#0d2b47"><i class="ti ti-tag"></i><h3>Applied offers</h3></div>
+          <div class="form-body" style="padding:1rem">
+            <div style="display:flex;align-items:center;gap:8px;padding:8px;background:#fdf3e0;border-radius:8px">
+              <i class="ti ti-discount-2" style="color:#9a5d0a;font-size:18px"></i>
+              <div style="font-size:12px"><div style="font-weight:600;color:#9a5d0a">FIRST10 applied</div><div style="color:var(--muted)">You saved ₹0 on this booking</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ PAGE: CONFIRMATION ═══════════════════════════════ -->
+<div id="page-confirmation" class="page">
+  <div class="confirm-page">
+    <div class="confirm-icon"><i class="ti ti-check"></i></div>
+    <h1 class="confirm-title">Booking confirmed!</h1>
+    <p class="confirm-sub">Your e-ticket has been sent to rahul.sharma@example.com · Check your inbox</p>
+
+    <div class="pnr-box">
+      <div class="pnr-label">YOUR PNR NUMBER</div>
+      <div class="pnr-code">SF7K3M</div>
+      <div style="font-size:12px;opacity:0.7;margin-top:6px">Keep this safe — you'll need it at the airport</div>
+    </div>
+
+    <div class="ticket-card">
+      <div class="ticket-head">
+        <div>
+          <div style="font-size:13px;font-weight:600">IndiGo · 6E 2108</div>
+          <div style="font-size:12px;color:var(--muted)">Economy · Boeing 737-800</div>
+        </div>
+        <span class="tag tag-info">Nonstop · 1h 55m</span>
+      </div>
+      <div class="ticket-body">
+        <div>
+          <div class="tkt-time">06:10</div>
+          <div class="tkt-city">JAI — Jaipur</div>
+        </div>
+        <div class="tkt-dur">
+          <div class="dur-line" style="justify-content:center"><div class="dl-dot"></div><div class="dl-seg"></div><i class="ti ti-plane dl-plane"></i><div class="dl-seg"></div><div class="dl-dot"></div></div>
+          <div style="font-size:11px;color:var(--muted)">1h 55m</div>
+        </div>
+        <div style="text-align:right">
+          <div class="tkt-time">08:05</div>
+          <div class="tkt-city">BOM — Mumbai</div>
+        </div>
+      </div>
+      <div class="tkt-date-row">
+        <div><span class="tkt-meta">Date: </span><span class="tkt-val">Thursday, 15 May 2026</span></div>
+        <div><span class="tkt-meta">Seat: </span><span class="tkt-val">14A (Window)</span></div>
+        <div><span class="tkt-meta">Baggage: </span><span class="tkt-val">15 kg</span></div>
+      </div>
+      <div class="ticket-footer">
+        <div>
+          <div style="font-size:12px;color:var(--muted)">Passenger</div>
+          <div style="font-size:14px;font-weight:600">Rahul Sharma</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:12px;color:var(--muted)">Total paid</div>
+          <div style="font-size:18px;font-weight:700;color:var(--sky)">₹4,239</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:12px;justify-content:center;margin-bottom:2rem">
+      <button class="btn-search" onclick="alert('Downloading e-ticket PDF...')"><i class="ti ti-download"></i>Download e-ticket</button>
+      <button style="padding:12px 24px;border:1px solid var(--sky);border-radius:8px;color:var(--sky);background:#fff;font-size:14px;cursor:pointer;font-family:var(--font-body);display:flex;align-items:center;gap:8px" onclick="alert('Opening calendar...')"><i class="ti ti-calendar-plus"></i>Add to calendar</button>
+      <button style="padding:12px 24px;border:1px solid var(--border);border-radius:8px;color:var(--muted);background:#fff;font-size:14px;cursor:pointer;font-family:var(--font-body);display:flex;align-items:center;gap:8px" onclick="alert('Sharing...')"><i class="ti ti-share"></i>Share</button>
+    </div>
+
+    <!-- Next steps -->
+    <div style="background:#fff;border-radius:var(--radius-lg);border:1px solid var(--border);padding:1.5rem;text-align:left">
+      <h3 style="font-family:var(--font-display);font-size:16px;margin-bottom:1rem">What's next?</h3>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="display:flex;gap:12px;align-items:flex-start"><div style="width:32px;height:32px;border-radius:50%;background:var(--sky-light);color:var(--sky);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0"><i class="ti ti-mail"></i></div><div><div style="font-size:13px;font-weight:600">Check your email</div><div style="font-size:12px;color:var(--muted)">E-ticket sent to rahul.sharma@example.com</div></div></div>
+        <div style="display:flex;gap:12px;align-items:flex-start"><div style="width:32px;height:32px;border-radius:50%;background:var(--sky-light);color:var(--sky);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0"><i class="ti ti-clock"></i></div><div><div style="font-size:13px;font-weight:600">Web check-in opens</div><div style="font-size:12px;color:var(--muted)">Available 48h before departure · 14 May from 06:10</div></div></div>
+        <div style="display:flex;gap:12px;align-items:flex-start"><div style="width:32px;height:32px;border-radius:50%;background:var(--sky-light);color:var(--sky);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0"><i class="ti ti-map-2"></i></div><div><div style="font-size:13px;font-weight:600">Arrive at airport</div><div style="font-size:12px;color:var(--muted)">Jaipur International — 2h before departure (by 04:10)</div></div></div>
+      </div>
+    </div>
+
+    <button class="btn-search" style="margin-top:1.5rem;padding:12px 32px" onclick="goto('home')"><i class="ti ti-home"></i>Back to home</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ PAGE: MY BOOKINGS / PROFILE ═══════════════════════════════ -->
+<div id="page-profile" class="page">
+  <div class="profile-page">
+    <div class="profile-grid">
+      <div class="profile-sidebar">
+        <div class="avatar">RS</div>
+        <div class="profile-name">Rahul Sharma</div>
+        <div class="profile-email">rahul.sharma@gmail.com</div>
+        <ul class="profile-nav">
+          <li class="active" onclick="setProfileNav(this)"><i class="ti ti-ticket"></i>My bookings</li>
+          <li onclick="setProfileNav(this)"><i class="ti ti-user"></i>Profile details</li>
+          <li onclick="setProfileNav(this)"><i class="ti ti-credit-card"></i>Saved cards</li>
+          <li onclick="setProfileNav(this)"><i class="ti ti-heart"></i>Wishlist</li>
+          <li onclick="setProfileNav(this)"><i class="ti ti-gift"></i>Rewards & offers</li>
+          <li onclick="setProfileNav(this)" style="color:var(--danger);margin-top:1rem"><i class="ti ti-logout"></i>Log out</li>
+        </ul>
+      </div>
+
+      <div>
+        <div class="section-head" style="margin-bottom:1rem"><h2>My bookings</h2><p>3 bookings · 1 upcoming</p></div>
+        <div class="booking-list">
+          <div class="bk-card">
+            <div>
+              <span class="bk-status bk-upcoming">Upcoming</span>
+              <div class="bk-route">JAI → BOM</div>
+              <div class="bk-info">IndiGo · 6E 2108 · 15 May 2026 · Economy</div>
+              <div style="margin-top:6px;display:flex;gap:8px">
+                <button class="sort-btn" onclick="goto('confirmation')">View ticket</button>
+                <button class="sort-btn" onclick="alert('Web check-in opens 14 May 06:10')">Web check-in</button>
+              </div>
+            </div>
+            <div></div>
+            <div>
+              <div class="bk-price">₹4,239</div>
+              <div class="bk-pnr">PNR: SF7K3M</div>
+            </div>
+          </div>
+
+          <div class="bk-card">
+            <div>
+              <span class="bk-status bk-completed">Completed</span>
+              <div class="bk-route">JAI → DEL</div>
+              <div class="bk-info">Air India · AI 445 · 2 Mar 2026 · Economy</div>
+              <div style="margin-top:6px;display:flex;gap:8px">
+                <button class="sort-btn">Download e-ticket</button>
+              </div>
+            </div>
+            <div></div>
+            <div>
+              <div class="bk-price">₹2,150</div>
+              <div class="bk-pnr">PNR: AI2M9X</div>
+            </div>
+          </div>
+
+          <div class="bk-card">
+            <div>
+              <span class="bk-status bk-cancelled">Cancelled</span>
+              <div class="bk-route">JAI → BLR</div>
+              <div class="bk-info">IndiGo · 6E 5544 · 10 Jan 2026 · Economy</div>
+              <div style="margin-top:6px;display:flex;gap:8px">
+                <button class="sort-btn" style="color:var(--danger);border-color:var(--danger)">Refund: ₹3,800 processed</button>
+              </div>
+            </div>
+            <div></div>
+            <div>
+              <div class="bk-price" style="text-decoration:line-through;color:var(--muted)">₹4,199</div>
+              <div class="bk-pnr">PNR: 6E8VK1</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ PAGE: LOGIN ═══════════════════════════════ -->
+<div id="page-login" class="page">
+  <div class="auth-page">
+    <div class="auth-box">
+      <div class="auth-logo"><i class="ti ti-plane"></i><span>SkyFly</span></div>
+      <h2 class="auth-title">Welcome back</h2>
+      <p class="auth-sub">Log in to manage your bookings</p>
+      <div class="auth-social">
+        <button class="btn-social"><i class="ti ti-brand-google" style="color:#4285f4"></i>Google</button>
+        <button class="btn-social"><i class="ti ti-brand-facebook" style="color:#1877f2"></i>Facebook</button>
+      </div>
+      <div class="auth-divider">or continue with email</div>
+      <div class="auth-form">
+        <div class="form-group"><label>Email address</label><input type="email" placeholder="you@example.com"></div>
+        <div class="form-group"><label>Password</label><input type="password" placeholder="••••••••"></div>
+        <div style="text-align:right;margin-top:-6px"><a style="font-size:12px;color:var(--sky);cursor:pointer;text-decoration:none">Forgot password?</a></div>
+        <button class="auth-submit" onclick="goto('home')">Log in</button>
+      </div>
+      <p class="auth-switch">Don't have an account? <a onclick="goto('signup')">Sign up</a></p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ PAGE: SIGNUP ═══════════════════════════════ -->
+<div id="page-signup" class="page">
+  <div class="auth-page">
+    <div class="auth-box">
+      <div class="auth-logo"><i class="ti ti-plane"></i><span>SkyFly</span></div>
+      <h2 class="auth-title">Create account</h2>
+      <p class="auth-sub">Join millions of smart travellers</p>
+      <div class="auth-social">
+        <button class="btn-social"><i class="ti ti-brand-google" style="color:#4285f4"></i>Google</button>
+        <button class="btn-social"><i class="ti ti-brand-facebook" style="color:#1877f2"></i>Facebook</button>
+      </div>
+      <div class="auth-divider">or fill in the form</div>
+      <div class="auth-form">
+        <div class="form-row cols2" style="gap:10px">
+          <div class="form-group"><label>First name</label><input type="text" placeholder="Rahul"></div>
+          <div class="form-group"><label>Last name</label><input type="text" placeholder="Sharma"></div>
+        </div>
+        <div class="form-group"><label>Email address</label><input type="email" placeholder="you@example.com"></div>
+        <div class="form-group"><label>Mobile number</label><input type="tel" placeholder="+91 00000 00000"></div>
+        <div class="form-group"><label>Password</label><input type="password" placeholder="Minimum 8 characters"></div>
+        <div class="form-group"><label>Confirm password</label><input type="password" placeholder="Repeat password"></div>
+        <label style="display:flex;gap:8px;align-items:flex-start;font-size:12px;color:var(--muted);cursor:pointer">
+          <input type="checkbox" style="margin-top:2px;accent-color:var(--sky)">
+          I agree to the <a style="color:var(--sky)">Terms of Service</a> and <a style="color:var(--sky)">Privacy Policy</a>
+        </label>
+        <button class="auth-submit" onclick="goto('home')">Create account</button>
+      </div>
+      <p class="auth-switch">Already have an account? <a onclick="goto('login')">Log in</a></p>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── NAVIGATION ───
+function goto(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  window.scrollTo(0, 0);
+  document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+  const map = {home:0,results:1,profile:2};
+  if (map[page] !== undefined) document.querySelectorAll('.nav-link')[map[page]].classList.add('active');
+}
+
+// ─── HOME ───
+let swapped = false;
+function swapCities() {
+  const el = document.getElementById('h-dest');
+  swapped = !swapped;
+  el.innerHTML = swapped ? 'Jaipur <small>JAI · Jaipur Int\'l</small>' : 'Mumbai <small>BOM · Chhatrapati Shivaji</small>';
+}
+function setTripTab(el) {
+  document.querySelectorAll('.trip-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// ─── RESULTS ───
+function setSort(el) {
+  document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+}
+function togglePill(el) { el.classList.toggle('active'); }
+
+// ─── PAYMENT ───
+function setPayMethod(el, method) {
+  document.querySelectorAll('.pay-method').forEach(m => m.classList.remove('active'));
+  el.classList.add('active');
+  ['card','upi','nb','wallet'].forEach(m => {
+    const el2 = document.getElementById('pay-' + m);
+    if (el2) el2.style.display = m === method ? 'block' : 'none';
+  });
+}
+function toggleUpi(el) {
+  document.querySelectorAll('.upi-logo').forEach(u => u.classList.remove('active'));
+  el.classList.add('active');
+}
+function fmtCard(el) {
+  let v = el.value.replace(/\D/g,'').substring(0,16);
+  el.value = v.replace(/(.{4})/g,'$1 ').trim();
+}
+function fmtExp(el) {
+  let v = el.value.replace(/\D/g,'');
+  if (v.length >= 2) v = v.substring(0,2) + '/' + v.substring(2,4);
+  el.value = v;
+}
+
+// ─── PROFILE NAV ───
+function setProfileNav(el) {
+  document.querySelectorAll('.profile-nav li').forEach(l => l.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// ─── SEAT MAP ───
+function buildSeatMap() {
+  const taken = [1,5,8,12,14,18,21,24];
+  let selected = null;
+  const map = document.getElementById('seat-map');
+  if (!map) return;
+  const rows = 6;
+  let html = '';
+  for (let r = 1; r <= rows; r++) {
+    html += '<div style="display:flex;gap:4px;margin-bottom:4px;align-items:center">';
+    html += '<span style="font-size:10px;color:var(--muted);width:16px;text-align:center">' + r + '</span>';
+    for (let s = 0; s < 7; s++) {
+      if (s === 3) { html += '<div style="width:20px"></div>'; continue; }
+      const id = r * 10 + s;
+      const isTaken = taken.includes(id);
+      const cls = isTaken ? 'taken' : 'free';
+      html += '<div class="seat ' + cls + '" data-id="' + id + '" style="width:36px;height:32px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;cursor:' + (isTaken ? 'not-allowed' : 'pointer') + ';border:1px solid ' + (isTaken ? '#e0e0e0' : '#b8e2c0') + ';background:' + (isTaken ? '#f0f0f0' : '#eaf6ec') + ';color:' + (isTaken ? '#ccc' : '#2d7a3a') + '" onclick="selectSeat(this,' + isTaken + ')">' + r + String.fromCharCode(64 + (s < 3 ? s + 1 : s)) + '</div>';
+    }
+    html += '</div>';
+  }
+  map.innerHTML = html;
+}
+function selectSeat(el, taken) {
+  if (taken) return;
+  document.querySelectorAll('.seat.selected').forEach(s => {
+    s.classList.remove('selected');
+    s.style.background = '#eaf6ec';
+    s.style.color = '#2d7a3a';
+    s.style.borderColor = '#b8e2c0';
+    s.classList.add('free');
+  });
+  el.classList.remove('free');
+  el.classList.add('selected');
+  el.style.background = '#1a3a5c';
+  el.style.color = '#fff';
+  el.style.borderColor = '#1a3a5c';
+}
+buildSeatMap();
+</script>
+</body>
+</html>
