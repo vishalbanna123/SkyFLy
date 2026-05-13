@@ -425,12 +425,27 @@ nav {
 .bg5 { background: linear-gradient(135deg, #3a1a5c, #7b2fb0); }
 .bg6 { background: linear-gradient(135deg, #1a5c5c, #2ba8a8); }
 
+/* ─── MAIN CONTAINERS ─── */
+.page-wrapper,
+.page-container {
+  min-height: calc(100vh - 60px);
+  width: 100%;
+}
+
+.page-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
 /* ─── FILTER SIDEBAR + RESULTS ─── */
 .results-layout {
   display: grid;
   grid-template-columns: 240px 1fr;
   gap: 1.5rem;
-  padding: 1.5rem 2rem;
+  padding: 2rem;
   max-width: 1100px;
   margin: 0 auto;
 }
@@ -744,7 +759,10 @@ nav {
 .booking-page {
   max-width: 960px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 2.5rem 2rem;
+  width: 100%;
+  box-sizing: border-box;
+  min-height: calc(100vh - 60px);
 }
 
 .booking-grid {
@@ -1192,6 +1210,8 @@ nav {
   margin: 0 auto;
   padding: 3rem 2rem;
   text-align: center;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .confirm-icon {
@@ -1310,7 +1330,10 @@ nav {
 .profile-page {
   max-width: 900px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 2.5rem 2rem;
+  width: 100%;
+  box-sizing: border-box;
+  min-height: calc(100vh - 60px);
 }
 
 .profile-grid {
@@ -1456,6 +1479,8 @@ nav {
   justify-content: center;
   padding: 2rem;
   background: var(--bg);
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .auth-box {
@@ -1465,6 +1490,7 @@ nav {
   padding: 2.5rem;
   width: 100%;
   max-width: 440px;
+  box-sizing: border-box;
 }
 
 .auth-logo {
@@ -1786,7 +1812,7 @@ hr.divider {
 
   /* Hero */
   .hero {
-    padding: 2rem 0 1.5rem;
+    padding: 2rem 1rem 1.5rem;
   }
 
   .hero h1 {
@@ -1799,12 +1825,29 @@ hr.divider {
 
   /* Search Box */
   .search-box {
-    padding: 1rem;
+    padding: 1.5rem;
     border-radius: 0;
   }
 
   .trip-tabs {
     margin-bottom: 1rem;
+  }
+
+  /* Page Content */
+  .page-content {
+    padding: 1.5rem;
+  }
+
+  /* Results Layout */
+  .results-layout {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    padding: 1.5rem;
+  }
+
+  .filter-panel {
+    position: relative;
+    top: auto;
   }
 
   /* Forms */
@@ -1835,13 +1878,13 @@ hr.divider {
 
   /* Breadcrumb */
   .breadcrumb {
-    padding: 0.75rem 1rem;
+    padding: 0.75rem 1.5rem;
     font-size: 12px;
   }
 
   /* General padding */
   .container {
-    padding: 1rem;
+    padding: 1.5rem;
   }
 
   /* Tables/Lists */
@@ -1851,6 +1894,11 @@ hr.divider {
 
   td, th {
     padding: 8px 4px;
+  }
+
+  /* Confirmation page */
+  .confirm-page {
+    padding: 2rem 1.5rem;
   }
 }
 
@@ -1876,6 +1924,10 @@ hr.divider {
   }
 
   /* Hero */
+  .hero {
+    padding: 1.5rem 1rem 1.25rem;
+  }
+
   .hero h1 {
     font-size: 24px;
     margin-bottom: 0.25rem;
@@ -1888,7 +1940,17 @@ hr.divider {
 
   /* Search Box */
   .search-box {
-    padding: 0.75rem;
+    padding: 1rem;
+  }
+
+  /* Page Content */
+  .page-content {
+    padding: 1rem;
+  }
+
+  /* Results Layout */
+  .results-layout {
+    padding: 1rem;
   }
 
   /* Input fields */
@@ -1900,7 +1962,7 @@ hr.divider {
 
   /* General */
   .container {
-    padding: 0.75rem;
+    padding: 1rem;
   }
 
   body {
@@ -1909,5 +1971,21 @@ hr.divider {
 
   button {
     min-height: 44px;
+  }
+
+  /* Breadcrumb */
+  .breadcrumb {
+    padding: 0.75rem 1rem;
+  }
+
+  /* Confirmation page */
+  .confirm-page {
+    padding: 1.5rem 1rem;
+  }
+
+  /* Order card */
+  .order-card {
+    position: relative;
+    top: auto;
   }
 }
