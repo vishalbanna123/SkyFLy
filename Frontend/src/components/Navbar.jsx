@@ -41,13 +41,14 @@ export default function Navbar({ currentPage, goto, user, onLogout }) {
               style={{
                 padding: '8px 16px',
                 borderRadius: '24px',
-                background: 'rgba(52, 144, 220, 0.1)',
+                background: '#1a1a1a',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '8px',
                 fontSize: '14px',
                 fontWeight: '500',
+                color: '#fff',
               }}
               onClick={handleProfileClick}
             >
