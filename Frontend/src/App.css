@@ -1757,3 +1757,157 @@ hr.divider {
   border-top: 1px solid var(--border);
   margin: 1rem 0;
 }
+
+/* ─── MOBILE RESPONSIVE ─── */
+@media (max-width: 768px) {
+  /* Navbar */
+  nav {
+    padding: 0 1rem;
+    height: 55px;
+  }
+
+  .brand-name {
+    font-size: 16px;
+  }
+
+  .nav-links {
+    display: none;
+  }
+
+  .nav-right {
+    gap: 8px;
+  }
+
+  .btn-login,
+  .btn-signup {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+
+  /* Hero */
+  .hero {
+    padding: 2rem 0 1.5rem;
+  }
+
+  .hero h1 {
+    font-size: 28px;
+  }
+
+  .hero-sub {
+    font-size: 13px;
+  }
+
+  /* Search Box */
+  .search-box {
+    padding: 1rem;
+    border-radius: 0;
+  }
+
+  .trip-tabs {
+    margin-bottom: 1rem;
+  }
+
+  /* Forms */
+  .form-row {
+    flex-direction: column !important;
+    gap: 0 !important;
+  }
+
+  .form-group {
+    width: 100% !important;
+  }
+
+  .input-group {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  /* Buttons */
+  button {
+    width: 100%;
+  }
+
+  /* Cards */
+  .flight-card,
+  .booking-card {
+    margin: 0.5rem 0;
+  }
+
+  /* Breadcrumb */
+  .breadcrumb {
+    padding: 0.75rem 1rem;
+    font-size: 12px;
+  }
+
+  /* General padding */
+  .container {
+    padding: 1rem;
+  }
+
+  /* Tables/Lists */
+  table {
+    font-size: 12px;
+  }
+
+  td, th {
+    padding: 8px 4px;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Navbar */
+  nav {
+    padding: 0 0.75rem;
+    height: 50px;
+  }
+
+  .brand-name {
+    font-size: 14px;
+  }
+
+  .brand i {
+    font-size: 18px;
+  }
+
+  .btn-login,
+  .btn-signup {
+    padding: 5px 10px;
+    font-size: 11px;
+  }
+
+  /* Hero */
+  .hero h1 {
+    font-size: 24px;
+    margin-bottom: 0.25rem;
+  }
+
+  .hero-sub {
+    font-size: 12px;
+    margin-bottom: 1.5rem;
+  }
+
+  /* Search Box */
+  .search-box {
+    padding: 0.75rem;
+  }
+
+  /* Input fields */
+  input,
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+
+  /* General */
+  .container {
+    padding: 0.75rem;
+  }
+
+  body {
+    font-size: 14px;
+  }
+
+  button {
+    min-height: 44px;
+  }
+}
