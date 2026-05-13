@@ -18,7 +18,13 @@ const app = express();
 // Middleware - CORS
 // Preflight requests (OPTIONS) must also include CORS headers.
 const corsOptions = {
-  origin: ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:5175', 'http://localhost:3000'],
+  origin: [
+    'http://localhost:5173',
+    'http://localhost:5174',
+    'http://localhost:5175',
+    'http://localhost:3000',
+    'https://skyflyyy.netlify.app', // Production frontend
+  ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
   // Axios may send additional headers like Accept; keep this permissive.
